@@ -1,0 +1,80 @@
+/* Reset básico */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #6200ea;
+    padding: 10px 20px;
+    color: white;
+  }
+  
+  header .logo {
+    width: 120px;
+  }
+  
+  header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  header nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+  }
+  
+  /* Layout principal */
+  main {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  /* Bolinhas */
+  #bolinhas, #lista-clientes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .bolinha {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .bolinha.preenchida {
+    background-color: green;
+    border-color: green;
+  }
+  
+  .bolinha:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Responsividade */
+  @media (max-width: 600px) {
+    header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    header nav ul {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  

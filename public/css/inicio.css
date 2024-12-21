@@ -1,0 +1,111 @@
+/* Estilo Global */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  background: linear-gradient(135deg, #1d2671, #c33764);
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: rgb(250, 247, 247), 0.5);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+.logo {
+  width: 50px;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+}
+
+.menu li {
+  margin: 0 15px;
+}
+
+.menu a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Cartão Fidelidade */
+.card-section {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.card-container {
+  margin: 20px auto;
+  width: 400px;
+  height: 400px;
+  background: #ccc;
+  border: 2px solid #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-container canvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* Detalhes do Cliente */
+.details-section {
+  padding: 20px;
+  margin-top: 20px;
+  background-color: rgba(203, 195, 195, 0.7);
+  border-radius: 10px;
+}
+body {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+.fidelity-card {
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.trip-slot {
+  background-color: #1317ff;
+  color: #000;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.trip-slot.completed {
+  background-color: rgb(255, 247, 3);
+  color: #fff;
+  cursor: default;
+}
+
+.trip-slot:hover:not(.completed) {
+  transform: scale(1.1);
+}

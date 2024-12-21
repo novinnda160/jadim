@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Sistema de Gestão de Clientes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background-color: #343a40;
+      color: white;
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      margin-bottom: 15px;
+      display: block;
+    }
+    .sidebar a:hover {
+      background-color: #495057;
+      padding-left: 10px;
+      border-radius: 5px;
+    }
+    .content {
+      margin-left: 270px;
+      width: 100%;
+      padding: 20px;
+    }
+    .logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+    .card-custom {
+      border-radius: 12px;
+    }
+    .btn-custom {
+      background-color: #6c757d;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="img/Imagem do WhatsApp de 2024-11-05 à(s) 11.15.44_a5ac06b4.jpg" alt="Logo" class="logo">
+    <h3>Admin Panel</h3>
+    <a href="clientes.html">Clientes</a>
+    <a href="relatorios.html">Listagem De Usuarios</a>
+    <a href="register.html">Registrar Usuarios</a>
+    <a href="admfideli.html">Pontos dos clientes</a>
+    <!-- Botão de Logout -->
+    <a href="#" id="logout" class="btn btn-danger">Sair</a>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <h1 class="text-center my-4">Painel Administrativo - Sistema de Gestão de Clientes</h1>
+
+    <!-- Formulário para adicionar/editar clientes -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <h4>Criar/Editar Cliente</h4>
+        <form id="cliente-form">
+          <input type="hidden" id="cliente-id">
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="nome" required>
+          </div>
+          <div class="mb-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" class="form-control" id="cpf" required>
+          </div>
+          <div class="mb-3">
+            <label for="endereco" class="form-label">Endereço</label>
+            <input type="text" class="form-control" id="endereco" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input type="text" class="form-control" id="telefone" required>
+          </div>
+          <div class="mb-3">
+            <label for="rg" class="form-label">RG</label>
+            <input type="text" class="form-control" id="rg" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Listagem de Clientes -->
+    <h3>Clientes Cadastrados</h3>
+    <div id="clientes-list" class="mb-3"></div>
+  </div>
+
+  <script>
+    // Verificação de login ao carregar a página
+    window.onload = function() {
+      const usuarioLogado = localStorage.getItem('usuarioLogado');
+      if (!usuarioLogado) {
+        // Caso não esteja logado, redireciona para a página de login
+        window.location.href = 'loguin.html';
+      }
+    };
+
+    // Função de logout
+    document.getElementById('logout').addEventListener('click', function() {
+      // Remove o usuário logado do localStorage e redireciona para o login
+      localStorage.removeItem('usuarioLogado');
+      window.location.href = 'loguin.html';
+    });
+
+    // Função para atualizar a lista de clientes
+    function renderClientes() {
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      const clientesList = document.getElementById('clientes-list');
+      clientesList.innerHTML = '';
+
+      clientes.forEach(cliente => {
+        const clienteDiv = document.createElement('div');
+        clienteDiv.classList.add('card', 'mb-3');
+        clienteDiv.innerHTML = `
+          <div class="card-body">
+            <h5>${cliente.nome}</h5>
+            <p><strong>CPF:</strong> ${cliente.cpf}</p>
+            <p><strong>Endereço:</strong> ${cliente.endereco}</p>
+            <p><strong>Email:</strong> ${cliente.email}</p>
+            <p><strong>Telefone:</strong> ${cliente.telefone}</p>
+            <p><strong>RG:</strong> ${cliente.rg}</p>
+            <button class="btn btn-warning" onclick="editarCliente(${cliente.id})">Editar</button>
+            <button class="btn btn-danger" onclick="excluirCliente(${cliente.id})">Excluir</button>
+          </div>
+        `;
+        clientesList.appendChild(clienteDiv);
+      });
+    }
+
+    // Função para criar ou editar um cliente
+    document.getElementById('cliente-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const cpf = document.getElementById('cpf').value;
+      const endereco = document.getElementById('endereco').value;
+      const email = document.getElementById('email').value;
+      const telefone = document.getElementById('telefone').value;
+      const rg = document.getElementById('rg').value;
+      const id = document.getElementById('cliente-id').value;
+
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      if (id) {
+        // Edita o cliente existente
+        const clienteIndex = clientes.findIndex(c => c.id == id);
+        if (clienteIndex !== -1) {
+          clientes[clienteIndex] = { id: parseInt(id), nome, cpf, endereco, email, telefone, rg };
+        }
+      } else {
+        // Cria um novo cliente
+        const novoCliente = {
+          id: clientes.length + 1,
+          nome,
+          cpf,
+          endereco,
+          email,
+          telefone,
+          rg,
+        };
+        clientes.push(novoCliente);
+      }
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      renderClientes();
+      document.getElementById('cliente-form').reset();
+      document.getElementById('cliente-id').value = ''; // Limpar o ID
+    });
+
+    // Função para editar um cliente
+    function editarCliente(clienteId) {
+      const clientes = JSON.parse(localStorage.getItem('clientes'));
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        document.getElementById('nome').value = cliente.nome;
+        document.getElementById('cpf').value = cliente.cpf;
+        document.getElementById('endereco').value = cliente.endereco;
+        document.getElementById('email').value = cliente.email;
+        document.getElementById('telefone').value = cliente.telefone;
+        document.getElementById('rg').value = cliente.rg;
+        document.getElementById('cliente-id').value = cliente.id; // Set ID do cliente para editar
+      }
+    }
+
+    // Função para excluir um cliente
+    function excluirCliente(clienteId) {
+      const clientes = JSON.parse(localStorage.getItem('clientes'));
+      const clientesFiltrados = clientes.filter(c => c.id !== clienteId);
+      localStorage.setItem('clientes', JSON.stringify(clientesFiltrados));
+      renderClientes(); // Atualiza a lista de clientes
+    }
+
+    // Inicializa a página
+    renderClientes();
+  </script>
+</body>
+</html>

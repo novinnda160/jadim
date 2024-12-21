@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fidelidade - Cliente</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .bolinhas {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .bolinha {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #ccc;
+      display: inline-block;
+    }
+
+    .bolinha.active {
+      background-color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <h1>Seu Programa de Fidelidade</h1>
+  <p>Complete 10 viagens e concorra a prêmios incríveis!</p>
+
+  <div class="bolinhas">
+    <!-- Bolinhas geradas dinamicamente -->
+  </div>
+
+  <script>
+    // Obter ID do cliente logado (simulação de login)
+    const userId = localStorage.getItem('userId') || prompt('Digite seu ID de usuário:');
+    localStorage.setItem('userId', userId); // Salva o ID do cliente no LocalStorage
+
+    // Função para renderizar as bolinhas com base nas viagens
+    function renderBolinhas(viagens) {
+      const container = document.querySelector('.bolinhas');
+      container.innerHTML = ''; // Limpa o container
+
+      for (let i = 0; i < 10; i++) {
+        const bolinha = document.createElement('div');
+        bolinha.classList.add('bolinha');
+        if (i < viagens) bolinha.classList.add('active'); // Marca como "ativa" se o índice for menor que o número de viagens
+        container.appendChild(bolinha);
+      }
+    }
+
+    // Long Polling para buscar atualizações em tempo real
+    async function fetchViagens() {
+      try {
+        const response = await fetch(`/api/fidelidade?userId=${userId}`, { method: 'GET' });
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem(`viagens_${userId}`, data.viagens); // Atualiza o cache local
+          renderBolinhas(data.viagens);
+        } else {
+          console.error('Erro ao buscar dados:', response.status);
+        }
+        setTimeout(fetchViagens, 3000); // Reexecuta o polling após 3 segundos
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        setTimeout(fetchViagens, 5000); // Tenta novamente em caso de erro
+      }
+    }
+
+    // Inicializa a página com dados do LocalStorage
+    const viagens = localStorage.getItem(`viagens_${userId}`) || 0;
+    renderBolinhas(viagens);
+
+    // Inicia o long polling
+    fetchViagens();
+  </script>
+</body>
+</html>

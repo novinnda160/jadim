@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizar Dados da Viagem</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Dados da Sua Viagem</h1>
+
+    <div id="cliente-dados" class="mt-4">
+      <h3>Seus Dados</h3>
+      <p><strong>Nome:</strong> <span id="nome"></span></p>
+      <p><strong>CPF:</strong> <span id="cpf"></span></p>
+      <p><strong>Telefone:</strong> <span id="telefone"></span></p>
+      <p><strong>Email:</strong> <span id="email"></span></p>
+      <p><strong>Endereço de Embarque:</strong> <span id="endereco-embarque"></span></p>
+      <p><strong>Endereço de Desembarque:</strong> <span id="endereco-desembarque"></span></p>
+      <p><strong>Data e Hora da Viagem:</strong> <span id="hora-data"></span></p>
+      <p><strong>Valor da Viagem:</strong> R$ <span id="valor-viagem"></span></p>
+    </div>
+  </div>
+
+  <script>
+    // Função para carregar e atualizar os dados do cliente em tempo real
+    function carregarDadosCliente() {
+      const clienteId = localStorage.getItem('clienteId'); // ID do cliente logado
+      if (!clienteId) {
+        alert('Você precisa estar logado para visualizar seus dados.');
+        return;
+      }
+
+      // Função de verificação em tempo real a cada 5 segundos
+      setInterval(() => {
+        const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+        const cliente = clientes.find(c => c.id == clienteId); // Encontra o cliente pelo ID
+
+        if (cliente) {
+          // Verifica e atualiza os dados, com tratamento de valores vazios
+          document.getElementById('nome').textContent = cliente.nome || 'Não informado';
+          document.getElementById('cpf').textContent = cliente.cpf || 'Não informado';
+          document.getElementById('telefone').textContent = cliente.telefone || 'Não informado';
+          document.getElementById('email').textContent = cliente.email || 'Não informado';
+          document.getElementById('endereco-embarque').textContent = cliente.enderecoEmbarque || 'Não informado';
+          document.getElementById('endereco-desembarque').textContent = cliente.enderecoDesembarque || 'Não informado';
+          document.getElementById('hora-data').textContent = cliente.horaData || 'Não informado';
+          
+          // Exibe o valor da viagem com 2 casas decimais, se disponível
+          if (cliente.valorViagem) {
+            document.getElementById('valor-viagem').textContent = `R$ ${parseFloat(cliente.valorViagem).toFixed(2)}`;
+          } else {
+            document.getElementById('valor-viagem').textContent = 'Não informado';
+          }
+        }
+      }, 5000); // Atualiza os dados a cada 5 segundos
+    }
+
+    // Carregar os dados quando a página carregar
+    carregarDadosCliente();
+  </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizar e Gerenciar Dados da Viagem</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Gerenciar Dados da Sua Viagem</h1>
+
+    <h3>Clientes Cadastrados</h3>
+    <table class="table table-bordered" id="clientes-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Email</th>
+          <th>Data e Hora da Viagem</th>
+          <th>Valor da Viagem</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="clientes-list"></tbody>
+    </table>
+
+    <h3>Editar Dados do Cliente</h3>
+    <form id="form-editar-cliente">
+      <input type="hidden" id="cliente-id">
+      <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" required>
+      </div>
+      <div class="mb-3">
+        <label for="cpf" class="form-label">CPF</label>
+        <input type="text" class="form-control" id="cpf" required>
+      </div>
+      <div class="mb-3">
+        <label for="telefone" class="form-label">Telefone</label>
+        <input type="text" class="form-control" id="telefone" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="endereco-embarque" class="form-label">Endereço de Embarque</label>
+        <input type="text" class="form-control" id="endereco-embarque" required>
+      </div>
+      <div class="mb-3">
+        <label for="endereco-desembarque" class="form-label">Endereço de Desembarque</label>
+        <input type="text" class="form-control" id="endereco-desembarque" required>
+      </div>
+      <div class="mb-3">
+        <label for="hora-data" class="form-label">Data e Hora da Viagem</label>
+        <input type="datetime-local" class="form-control" id="hora-data" required>
+      </div>
+      <div class="mb-3">
+        <label for="valor-viagem" class="form-label">Valor da Viagem</label>
+        <input type="number" class="form-control" id="valor-viagem" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </form>
+  </div>
+
+  <script>
+    // Função para carregar a lista de clientes cadastrados
+    function carregarClientes() {
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      console.log("Clientes carregados: ", clientes); // Verifica os dados carregados do localStorage
+
+      const tableBody = document.getElementById('clientes-list');
+      tableBody.innerHTML = '';  // Limpa a tabela
+
+      // Se não houver clientes no localStorage, exibe mensagem
+      if (clientes.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum cliente cadastrado.</td></tr>';
+        return;
+      }
+
+      clientes.forEach(cliente => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${cliente.nome}</td>
+          <td>${cliente.cpf}</td>
+          <td>${cliente.email}</td>
+          <td>${cliente.horaData}</td>
+          <td>R$ ${parseFloat(cliente.valorViagem).toFixed(2)}</td>
+          <td>
+            <button class="btn btn-warning" onclick="editarCliente(${cliente.id})">Editar</button>
+            <button class="btn btn-danger" onclick="excluirCliente(${cliente.id})">Excluir</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Função para editar um cliente
+    function editarCliente(id) {
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      const cliente = clientes.find(c => c.id === id);
+      
+      console.log("Editando cliente: ", cliente); // Verifica o cliente sendo editado
+
+      if (cliente) {
+        document.getElementById('cliente-id').value = cliente.id;
+        document.getElementById('nome').value = cliente.nome;
+        document.getElementById('cpf').value = cliente.cpf;
+        document.getElementById('telefone').value = cliente.telefone;
+        document.getElementById('email').value = cliente.email;
+        document.getElementById('endereco-embarque').value = cliente.enderecoEmbarque;
+        document.getElementById('endereco-desembarque').value = cliente.enderecoDesembarque;
+        document.getElementById('hora-data').value = cliente.horaData;
+        document.getElementById('valor-viagem').value = cliente.valorViagem;
+      }
+    }
+
+    // Função para excluir um cliente
+    function excluirCliente(id) {
+      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      clientes = clientes.filter(cliente => cliente.id !== id);
+
+      console.log("Clientes após exclusão: ", clientes); // Verifica os clientes após a exclusão
+
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      carregarClientes(); // Atualiza a lista de clientes
+    }
+
+    // Manipulando o formulário de edição
+    document.getElementById('form-editar-cliente').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const cliente = {
+        id: document.getElementById('cliente-id').value || Date.now(),
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value,
+        enderecoEmbarque: document.getElementById('endereco-embarque').value,
+        enderecoDesembarque: document.getElementById('endereco-desembarque').value,
+        horaData: document.getElementById('hora-data').value,
+        valorViagem: document.getElementById('valor-viagem').value,
+      };
+
+      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      const index = clientes.findIndex(c => c.id === cliente.id);
+      if (index > -1) {
+        clientes[index] = cliente; // Atualiza cliente
+      } else {
+        clientes.push(cliente); // Adiciona novo cliente
+      }
+
+      console.log("Clientes após salvamento: ", clientes); // Verifica os clientes após salvar
+
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      carregarClientes(); // Atualiza a lista de clientes
+      document.getElementById('form-editar-cliente').reset(); // Limpa o formulário
+    });
+
+    // Carregar a lista de clientes ao iniciar a página
+    carregarClientes();
+  </script>
+</body>
+</html>

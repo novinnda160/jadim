@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transportadora Moderna</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background: rgba(93, 91, 91, 0.312);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(8, 8, 8, 0.9);
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #ffffff;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #fffefe;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #800ae8;
+    }
+
+    .banner {
+      height: 100vh;
+      background: url('img/wheel-fortunel-lottery-game_445292-1233.jpg') no-repeat center center/cover;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .banner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .banner-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .banner-content h1 {
+      font-size: 3rem;
+      color: #f0c14b;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .banner-content p {
+      font-size: 1.2rem;
+      margin-top: 15px;
+      color: #ffffff;
+    }
+
+    section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    footer {
+      background: #212020;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      nav ul {
+        flex-direction: column;
+        background: rgba(11, 11, 11, 0.9);
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        padding: 20px;
+        display: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      nav ul.active {
+        display: flex;
+      }
+
+      .banner-content h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>GSales</h2> 
+    <nav>
+      <span class="menu-toggle">&#9776;</span>
+      <ul>
+        <li><a href="fideli.html">Seus Pontos</a></li>
+        <li><a href="dadosclinte.html">Dados De Sua Viagem</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="banner">
+    <div class="banner-content">
+      <h1>GSales Fidelidade</h1>
+      <p>Faça 10 viagens e concorra a prêmios incríveis!</p>
+    </div>
+  </div>
+
+  <section id="servicos">
+    <h2>Nossos Serviços</h2>
+    <div class="services">
+      <div class="card">
+        <h3>Hóspedagem</h3>
+      </div>
+      <div class="card">
+        <h3>Túrismo</h3>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 GSales - Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('nav ul');
+
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+  </script>
+</body>
+</html>
