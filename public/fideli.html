@@ -1,90 +1,156 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fidelidade - Cliente</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Fidelidade</title>
+    <style>
+        /* Estilos Gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    h1 {
-      margin-bottom: 20px;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
 
-    .bolinhas {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    .bolinha {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #ccc;
-      display: inline-block;
-    }
+        h1, h2, p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .bolinha.active {
-      background-color: #4caf50;
-    }
-  </style>
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li span {
+            font-weight: bold;
+        }
+
+        .status {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .completed {
+            color: #4CAF50;
+        }
+
+        .pending {
+            color: #e74c3c;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Seu Programa de Fidelidade</h1>
-  <p>Complete 10 viagens e concorra a prêmios incríveis!</p>
+    <div class="container">
+        <h1>Fidelidade - Progresso do Cliente</h1>
+        <p>Complete 10 viagens para ganhar um prêmio exclusivo!</p>
 
-  <div class="bolinhas">
-    <!-- Bolinhas geradas dinamicamente -->
-  </div>
+        <div>
+            <h2>Minhas Viagens</h2>
+            <ul id="travel-list">
+                <!-- As viagens serão exibidas aqui -->
+            </ul>
+        </div>
 
-  <script>
-    // Obter ID do cliente logado (simulação de login)
-    const userId = localStorage.getItem('userId') || prompt('Digite seu ID de usuário:');
-    localStorage.setItem('userId', userId); // Salva o ID do cliente no LocalStorage
+        <div class="status">
+            <p>Você já completou <span id="travel-count">0</span> viagens de 10.</p>
+            <p id="status-message" class="pending">Continue viajando para alcançar seu prêmio!</p>
+        </div>
+    </div>
 
-    // Função para renderizar as bolinhas com base nas viagens
-    function renderBolinhas(viagens) {
-      const container = document.querySelector('.bolinhas');
-      container.innerHTML = ''; // Limpa o container
-
-      for (let i = 0; i < 10; i++) {
-        const bolinha = document.createElement('div');
-        bolinha.classList.add('bolinha');
-        if (i < viagens) bolinha.classList.add('active'); // Marca como "ativa" se o índice for menor que o número de viagens
-        container.appendChild(bolinha);
-      }
-    }
-
-    // Long Polling para buscar atualizações em tempo real
-    async function fetchViagens() {
-      try {
-        const response = await fetch(`/api/fidelidade?userId=${userId}`, { method: 'GET' });
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem(`viagens_${userId}`, data.viagens); // Atualiza o cache local
-          renderBolinhas(data.viagens);
-        } else {
-          console.error('Erro ao buscar dados:', response.status);
+    <script>
+        // Função para obter viagens do localStorage
+        function getTravelData() {
+            return JSON.parse(localStorage.getItem('travels')) || [];
         }
-        setTimeout(fetchViagens, 3000); // Reexecuta o polling após 3 segundos
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-        setTimeout(fetchViagens, 5000); // Tenta novamente em caso de erro
-      }
-    }
 
-    // Inicializa a página com dados do LocalStorage
-    const viagens = localStorage.getItem(`viagens_${userId}`) || 0;
-    renderBolinhas(viagens);
+        // Atualiza a lista de viagens na interface
+        function updateTravelList() {
+            const travels = getTravelData();
+            const travelList = document.getElementById('travel-list');
+            const travelCount = document.getElementById('travel-count');
+            const statusMessage = document.getElementById('status-message');
 
-    // Inicia o long polling
-    fetchViagens();
-  </script>
+            // Limpa a lista de viagens
+            travelList.innerHTML = '';
+
+            // Adiciona cada viagem à lista
+            travels.forEach((travel, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>Viagem ${index + 1}:</span> ${travel}`;
+                travelList.appendChild(li);
+            });
+
+            // Atualiza o contador de viagens
+            travelCount.textContent = travels.length;
+
+            // Verifica se o cliente atingiu a meta
+            if (travels.length >= 10) {
+                statusMessage.textContent = 'Parabéns! Você conquistou seu prêmio!';
+                statusMessage.classList.remove('pending');
+                statusMessage.classList.add('completed');
+            } else {
+                statusMessage.textContent = 'Continue viajando para alcançar seu prêmio!';
+                statusMessage.classList.remove('completed');
+                statusMessage.classList.add('pending');
+            }
+        }
+
+        // Função para adicionar uma nova viagem (simulação)
+        function addTravel(travelName) {
+            const travels = getTravelData();
+            travels.push(travelName);
+            localStorage.setItem('travels', JSON.stringify(travels));
+            updateTravelList();
+        }
+
+        // Configura o long-polling para atualizar as viagens
+        function longPolling() {
+            setInterval(() => {
+                updateTravelList(); // Atualiza a lista de viagens a cada 2 segundos
+            }, 2000);
+        }
+
+        // Inicializa a página ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTravelList(); // Atualiza a lista imediatamente
+            longPolling(); // Inicia o long-polling
+        });
+    </script>
 </body>
 </html>

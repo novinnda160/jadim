@@ -279,6 +279,29 @@ app.post('/api/editar-cliente', express.json(), (req, res) => {
 
 
 // --------------------------------------------------------------------
+
+app.get('/api/clientes', (req, res) => res.json(clientes));
+
+app.post('/api/fidelidade', (req, res) => {
+  const { clienteId, viagemIndex } = req.body;
+  const cliente = clientes.find(c => c.id === clienteId);
+  if (!cliente) return res.status(404).json({ message: 'Cliente não encontrado' });
+
+  if (viagemIndex < 0 || viagemIndex >= 10) {
+    return res.status(400).json({ message: 'Viagem inválida!' });
+  }
+
+  cliente.viagens[viagemIndex].completada = true;
+  res.status(200).json({ message: 'Viagem marcada com sucesso.' });
+});
+
+app.get('/api/fidelidade', (req, res) => {
+  const { userId } = req.query;
+  const cliente = clientes.find(c => c.id == userId);
+  if (!cliente) return res.status(404).json({ message: 'Cliente não encontrado' });
+
+  res.json({ viagens: cliente.viagens });
+});
 // INICIALIZA O SERVIDOR
 // --------------------------------------------------------------------
 app.listen(PORT, () => {
