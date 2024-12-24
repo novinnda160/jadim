@@ -277,7 +277,35 @@ app.post('/api/editar-cliente', express.json(), (req, res) => {
 });
 
 
+//--------------------------------------------------------------------------------------------
 
+// Listar usuários
+app.get('/usuarios', (req, res) => res.json(usuarios));
+
+// Adicionar viagem a um usuário
+app.post('/usuarios/:id/viagem', (req, res) => {
+  const usuario = usuarios.find(u => u.id == req.params.id);
+  if (!usuario) return res.status(404).send('Usuário não encontrado.');
+
+  const viagem = req.body.viagem;
+  usuario.viagens.push(viagem);
+  res.json(usuario);
+});
+
+// Remover viagem
+app.delete('/usuarios/:id/viagem/:index', (req, res) => {
+  const usuario = usuarios.find(u => u.id == req.params.id);
+  if (!usuario) return res.status(404).send('Usuário não encontrado.');
+
+  usuario.viagens.splice(req.params.index, 1);
+  res.json(usuario);
+});
+
+// Remover usuário
+app.delete('/usuarios/:id', (req, res) => {
+  usuarios = usuarios.filter(u => u.id != req.params.id);
+  res.status(204).send();
+});
 // --------------------------------------------------------------------
 
 app.get('/api/clientes', (req, res) => res.json(clientes));
