@@ -68,12 +68,9 @@
     // Função para carregar a lista de clientes cadastrados
     function carregarClientes() {
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      console.log("Clientes carregados: ", clientes); // Verifica os dados carregados do localStorage
-
       const tableBody = document.getElementById('clientes-list');
-      tableBody.innerHTML = '';  // Limpa a tabela
+      tableBody.innerHTML = ''; // Limpa a tabela
 
-      // Se não houver clientes no localStorage, exibe mensagem
       if (clientes.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum cliente cadastrado.</td></tr>';
         return;
@@ -88,8 +85,8 @@
           <td>${cliente.horaData}</td>
           <td>R$ ${parseFloat(cliente.valorViagem).toFixed(2)}</td>
           <td>
-            <button class="btn btn-warning" onclick="editarCliente(${cliente.id})">Editar</button>
-            <button class="btn btn-danger" onclick="excluirCliente(${cliente.id})">Excluir</button>
+            <button class="btn btn-warning" onclick="editarCliente('${cliente.id}')">Editar</button>
+            <button class="btn btn-danger" onclick="excluirCliente('${cliente.id}')">Excluir</button>
           </td>
         `;
         tableBody.appendChild(row);
@@ -100,8 +97,6 @@
     function editarCliente(id) {
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       const cliente = clientes.find(c => c.id === id);
-      
-      console.log("Editando cliente: ", cliente); // Verifica o cliente sendo editado
 
       if (cliente) {
         document.getElementById('cliente-id').value = cliente.id;
@@ -121,8 +116,6 @@
       let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       clientes = clientes.filter(cliente => cliente.id !== id);
 
-      console.log("Clientes após exclusão: ", clientes); // Verifica os clientes após a exclusão
-
       localStorage.setItem('clientes', JSON.stringify(clientes));
       carregarClientes(); // Atualiza a lista de clientes
     }
@@ -132,7 +125,7 @@
       event.preventDefault();
 
       const cliente = {
-        id: document.getElementById('cliente-id').value || Date.now(),
+        id: document.getElementById('cliente-id').value || Date.now().toString(), // Garante que o ID seja string
         nome: document.getElementById('nome').value,
         cpf: document.getElementById('cpf').value,
         telefone: document.getElementById('telefone').value,
@@ -150,8 +143,6 @@
       } else {
         clientes.push(cliente); // Adiciona novo cliente
       }
-
-      console.log("Clientes após salvamento: ", clientes); // Verifica os clientes após salvar
 
       localStorage.setItem('clientes', JSON.stringify(clientes));
       carregarClientes(); // Atualiza a lista de clientes

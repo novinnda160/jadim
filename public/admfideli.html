@@ -1,208 +1,85 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Gerenciamento de Usuários</title>
-    <style>
-        /* Estilos Gerais */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<script>
+  // Funções para acessar e gerenciar os usuários no localStorage
+  function getUsers() {
+      return JSON.parse(localStorage.getItem('users')) || [];
+  }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
+  function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+  }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+  // Função para adicionar novo cliente
+  function addUser(user) {
+      const users = getUsers();
+      users.push(user);
+      saveUsers(users);
+      renderUserList();
+  }
 
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+  // Função para excluir usuário pelo ID
+  function deleteUser(userId) {
+      const users = getUsers();
+      const filteredUsers = users.filter(user => user.id !== userId); // Filtra usuários, excluindo o com o ID fornecido
+      saveUsers(filteredUsers); // Salva a nova lista no localStorage
+      renderUserList(); // Atualiza a interface
+  }
 
-        /* Botões */
-        button {
-            background: #4CAF50;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
+  // Função para renderizar a lista de usuários
+  function renderUserList() {
+      const users = getUsers();
+      const userListContainer = document.getElementById('user-list');
+      userListContainer.innerHTML = ''; // Limpa a lista
 
-        button:hover {
-            background: #45a049;
-        }
+      if (users.length === 0) {
+          userListContainer.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
+          return;
+      }
 
-        .danger {
-            background: #e74c3c;
-        }
+      users.forEach(user => {
+          const userCard = document.createElement('div');
+          userCard.classList.add('user-card');
+          userCard.innerHTML = `
+              <h3>${user.name} <span>(ID: ${user.id})</span></h3>
+              <ul>
+                  ${user.travels.map((travel, index) => `
+                      <li>
+                          ${travel} 
+                          <button class="danger" onclick="deleteTravel('${user.id}', ${index})">Excluir</button>
+                      </li>
+                  `).join('')}
+              </ul>
+              <div style="margin-top: 10px;">
+                  <button onclick="sendTravelToUser('${user.id}')">Enviar Viagem</button>
+                  <button class="danger" onclick="deleteUser('${user.id}')">Excluir Usuário</button>
+              </div>
+          `;
+          userListContainer.appendChild(userCard);
+      });
+  }
 
-        .danger:hover {
-            background: #c0392b;
-        }
+  // Listener para o formulário de criação de cliente
+  document.getElementById('create-user-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const cpf = document.getElementById('cpf').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
 
-        /* Lista de Usuários */
-        .user-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
+      const newUser = {
+          id: Date.now().toString(), // Gera um ID único
+          name,
+          cpf,
+          email,
+          phone,
+          travels: [] // Inicializa sem viagens
+      };
 
-        .user-card {
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+      addUser(newUser);
 
-        .user-card h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
+      // Limpa o formulário
+      event.target.reset();
+  });
 
-        .user-card ul {
-            list-style: none;
-            margin: 10px 0;
-        }
-
-        .user-card ul li {
-            font-size: 14px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-card ul li button {
-            font-size: 12px;
-            padding: 5px 10px;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            h1, h2 {
-                font-size: 22px;
-            }
-
-            button {
-                font-size: 12px;
-                padding: 8px 12px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Admin - Gerenciamento de Usuários</h1>
-        <h2>Lista de Usuários</h2>
-
-        <div id="user-list" class="user-list">
-            <!-- Os cartões de usuários serão gerados dinamicamente -->
-        </div>
-    </div>
-
-    <script>
-        // Funções para acessar os usuários no localStorage
-        function getUsers() {
-            return JSON.parse(localStorage.getItem('users')) || [];
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-
-        // Função para adicionar viagens ao usuário
-        function sendTravelToUser(userId) {
-            const users = getUsers();
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                const travelName = `Viagem em ${new Date().toLocaleTimeString()}`;
-                user.travels.push(travelName);
-                saveUsers(users);
-                alert(`Viagem enviada para ${user.name}: ${travelName}`);
-                renderUserList(); // Atualiza a interface
-            }
-        }
-
-        // Função para excluir uma viagem de um usuário
-        function deleteTravel(userId, travelIndex) {
-            const users = getUsers();
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.travels.splice(travelIndex, 1); // Remove a viagem
-                saveUsers(users);
-                renderUserList(); // Atualiza a interface
-            }
-        }
-
-        // Função para excluir um usuário
-        function deleteUser(userId) {
-            let users = getUsers();
-            users = users.filter(user => user.id !== userId); // Remove o usuário
-            saveUsers(users);
-            renderUserList(); // Atualiza a interface
-        }
-
-        // Função para renderizar a lista de usuários na interface
-        function renderUserList() {
-            const users = getUsers();
-            const userListContainer = document.getElementById('user-list');
-            userListContainer.innerHTML = ''; // Limpa a lista
-
-            if (users.length === 0) {
-                userListContainer.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
-                return;
-            }
-
-            users.forEach(user => {
-                const userCard = document.createElement('div');
-                userCard.classList.add('user-card');
-                userCard.innerHTML = `
-                    <h3>${user.name} <span>(ID: ${user.id})</span></h3>
-                    <ul>
-                        ${user.travels.map((travel, index) => `
-                            <li>
-                                ${travel} 
-                                <button class="danger" onclick="deleteTravel('${user.id}', ${index})">Excluir</button>
-                            </li>
-                        `).join('')}
-                    </ul>
-                    <div style="margin-top: 10px;">
-                        <button onclick="sendTravelToUser('${user.id}')">Enviar Viagem</button>
-                        <button class="danger" onclick="deleteUser('${user.id}')">Excluir Usuário</button>
-                    </div>
-                `;
-                userListContainer.appendChild(userCard);
-            });
-        }
-
-        // Inicializa a interface com seus usuários reais
-        function initializeWithRealUsers() {
-            const existingUsers = getUsers();
-            if (existingUsers.length === 0) {
-                alert("Nenhum usuário encontrado no localStorage. Adicione usuários para começar.");
-            }
-            renderUserList();
-        }
-
-        // Inicia o sistema
-        initializeWithRealUsers();
-    </script>
-</body>
-</html>
+  // Inicializa a lista de usuários ao carregar a página
+  renderUserList();
+</script>
