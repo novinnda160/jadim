@@ -1,29 +1,31 @@
-// Função para fazer login do usuário
-function loginUser(email, password) {
-    if (!email || !password) {
-        alert('Email e senha são obrigatórios.');
-        return;
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Evita o comportamento padrão do formulário
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+            throw new Error("Credenciais inválidas ou erro no servidor.");
+        }
+
+        const data = await response.json();
+
+        // Salva o token JWT e o ID do cliente no localStorage
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("clienteId", data.user.id);
+
+        // Redireciona para a página inicial
+        window.location.href = "/home";
+    } catch (error) {
+        alert("Erro ao fazer login: " + error.message);
     }
-
-    // Recuperar usuários do LocalStorage
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-
-    // Encontrar o usuário pelo email
-    const user = users.find(user => user.email === email);
-
-    if (!user) {
-        alert('Usuário não encontrado.');
-        return;
-    }
-
-    // Verificar a senha
-    if (user.password !== password) {
-        alert('Senha incorreta.');
-        return;
-    }
-
-    // Autenticação bem-sucedida
-    alert('Login realizado com sucesso Aperte em OK e Aproveite!');
-    localStorage.setItem('loggedInUser', JSON.stringify(user)); // Salva o usuário logado
-    window.location.href = 'home.html'; // Redireciona para a página inicial
-}
+});

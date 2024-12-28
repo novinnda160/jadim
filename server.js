@@ -119,7 +119,6 @@ app.post("/register", async (req, res) => {
   users.push(newUser);
   res.status(201).json({ message: "Usuário registrado com sucesso!", user: newUser });
 });
-
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -214,11 +213,6 @@ app.post("/sendClientData", (req, res) => {
   res.status(201).json({ message: "Cliente adicionado com sucesso!", cliente: novoCliente });
 });
 
-
-//-----------------------------------------------
-
-let clientRequests = []; // Armazena os clientes que estão aguardando por novas atualizações
-
 // Configurar o endpoint de long polling
 app.get('/api/cliente/:id', (req, res) => {
   const clienteId = parseInt(req.params.id, 10);
@@ -276,60 +270,6 @@ app.post('/api/editar-cliente', express.json(), (req, res) => {
   }
 });
 
-
-//--------------------------------------------------------------------------------------------
-
-// Listar usuários
-app.get('/usuarios', (req, res) => res.json(usuarios));
-
-// Adicionar viagem a um usuário
-app.post('/usuarios/:id/viagem', (req, res) => {
-  const usuario = usuarios.find(u => u.id == req.params.id);
-  if (!usuario) return res.status(404).send('Usuário não encontrado.');
-
-  const viagem = req.body.viagem;
-  usuario.viagens.push(viagem);
-  res.json(usuario);
-});
-
-// Remover viagem
-app.delete('/usuarios/:id/viagem/:index', (req, res) => {
-  const usuario = usuarios.find(u => u.id == req.params.id);
-  if (!usuario) return res.status(404).send('Usuário não encontrado.');
-
-  usuario.viagens.splice(req.params.index, 1);
-  res.json(usuario);
-});
-
-// Remover usuário
-app.delete('/usuarios/:id', (req, res) => {
-  usuarios = usuarios.filter(u => u.id != req.params.id);
-  res.status(204).send();
-});
-// --------------------------------------------------------------------
-
-app.get('/api/clientes', (req, res) => res.json(clientes));
-
-app.post('/api/fidelidade', (req, res) => {
-  const { clienteId, viagemIndex } = req.body;
-  const cliente = clientes.find(c => c.id === clienteId);
-  if (!cliente) return res.status(404).json({ message: 'Cliente não encontrado' });
-
-  if (viagemIndex < 0 || viagemIndex >= 10) {
-    return res.status(400).json({ message: 'Viagem inválida!' });
-  }
-
-  cliente.viagens[viagemIndex].completada = true;
-  res.status(200).json({ message: 'Viagem marcada com sucesso.' });
-});
-
-app.get('/api/fidelidade', (req, res) => {
-  const { userId } = req.query;
-  const cliente = clientes.find(c => c.id == userId);
-  if (!cliente) return res.status(404).json({ message: 'Cliente não encontrado' });
-
-  res.json({ viagens: cliente.viagens });
-});
 // INICIALIZA O SERVIDOR
 // --------------------------------------------------------------------
 app.listen(PORT, () => {
