@@ -3,20 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="css/login.css">
+    <title>Login - Gsales Turismo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+            margin-top: 100px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background: #2575fc;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+        }
+
+        input[type="submit"]:hover {
+            background: #6a11cb;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            input {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
+
     <div class="form-container">
-        <h1> Gsales Turismo!</h1>
+        <h1>Login</h1>
         <form id="loginForm">
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
+            <input type="submit" value="Entrar">
         </form>
+        <div class="form-footer">
+            <p>Não tem uma conta? <a href="register.html">Cadastre-se</a></p>
+        </div>
     </div>
 
-    <!-- O script principal -->
-    <script src="js/login.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            loginUser(email, password);
+        });
+
+        function loginUser(email, password) {
+            // Recuperar os usuários do localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Verificar se o usuário existe e a senha está correta
+            const user = users.find(user => user.email === email && user.password === password);
+
+            if (user) {
+                alert('Login bem-sucedido!');
+                window.location.href = 'home.html'; // Redireciona para a página inicial do usuário
+            } else {
+                alert('Email ou senha inválidos');
+            }
+        }
+    </script>
+
 </body>
 </html>

@@ -104,7 +104,8 @@
               placeholder="Pontos"
             />
             <button class="btn btn-success btn-sm" onclick="addPoints(${client.id})">Adicionar</button>
-            <button class="btn btn-danger btn-sm" onclick="removePoints(${client.id})">Remover Todos</button>
+            <button class="btn btn-danger btn-sm" onclick="removePoints(${client.id})">Remover Pontos</button>
+            <button class="btn btn-danger btn-sm" onclick="removeClient(${client.id})">Remover Cliente</button>
           </td>
         `;
         clientsTable.appendChild(row);
@@ -146,7 +147,7 @@
       }
     }
 
-    // Remove todos os pontos de um cliente
+    // Remove pontos de um cliente
     function removePoints(clientId) {
       const clients = JSON.parse(localStorage.getItem('clientes')) || [];
       const clientIndex = clients.findIndex(client => client.id === clientId);
@@ -155,6 +156,20 @@
         localStorage.setItem('clientes', JSON.stringify(clients));
         loadClients();
         alert(`Os pontos do cliente "${clients[clientIndex].name}" foram removidos.`);
+      } else {
+        alert('Cliente não encontrado!');
+      }
+    }
+
+    // Remove um cliente da lista
+    function removeClient(clientId) {
+      const clients = JSON.parse(localStorage.getItem('clientes')) || [];
+      const clientIndex = clients.findIndex(client => client.id === clientId);
+      if (clientIndex !== -1) {
+        clients.splice(clientIndex, 1); // Remove o cliente
+        localStorage.setItem('clientes', JSON.stringify(clients));
+        loadClients();
+        alert('Cliente removido com sucesso.');
       } else {
         alert('Cliente não encontrado!');
       }
