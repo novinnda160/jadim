@@ -10,13 +10,50 @@
   <div class="container mt-5">
     <h1 class="text-center">Gerenciar Clientes</h1>
 
+    <h3>Adicionar Cliente</h3>
+    <form id="form-adicionar-cliente" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="nome" class="form-label">Nome</label>
+          <input type="text" class="form-control" id="nome" required>
+        </div>
+        <div class="col-md-6">
+          <label for="cpf" class="form-label">CPF</label>
+          <input type="text" class="form-control" id="cpf" required>
+        </div>
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="col-md-6">
+          <label for="hora-data" class="form-label">Data e Hora da Viagem</label>
+          <input type="datetime-local" class="form-control" id="hora-data" required>
+        </div>
+        <div class="col-md-6">
+          <label for="endereco-embarque" class="form-label">Endereço de Embarque</label>
+          <input type="text" class="form-control" id="endereco-embarque" required>
+        </div>
+        <div class="col-md-6">
+          <label for="endereco-desembarque" class="form-label">Endereço de Desembarque</label>
+          <input type="text" class="form-control" id="endereco-desembarque" required>
+        </div>
+        <div class="col-md-6">
+          <label for="valor-viagem" class="form-label">Valor da Viagem</label>
+          <input type="number" class="form-control" id="valor-viagem" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">Adicionar Cliente</button>
+    </form>
+
     <h3>Clientes Cadastrados</h3>
-    <table class="table table-bordered" id="clientes-table">
-      <thead>
+    <table class="table table-bordered table-striped" id="clientes-table">
+      <thead class="table-dark">
         <tr>
           <th>Nome</th>
           <th>CPF</th>
           <th>Email</th>
+          <th>Endereço Embarque</th>
+          <th>Endereço Desembarque</th>
           <th>Data e Hora da Viagem</th>
           <th>Valor da Viagem</th>
           <th>Ações</th>
@@ -24,92 +61,65 @@
       </thead>
       <tbody id="clientes-list"></tbody>
     </table>
-
-    <h3>Editar Dados do Cliente</h3>
-    <form id="form-editar-cliente">
-      <input type="hidden" id="cliente-id">
-      <div class="mb-3">
-        <label for="nome" class="form-label">Nome</label>
-        <input type="text" class="form-control" id="nome" required>
-      </div>
-      <div class="mb-3">
-        <label for="cpf" class="form-label">CPF</label>
-        <input type="text" class="form-control" id="cpf" required>
-      </div>
-      <div class="mb-3">
-        <label for="telefone" class="form-label">Telefone</label>
-        <input type="text" class="form-control" id="telefone" required>
-      </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email" required>
-      </div>
-      <div class="mb-3">
-        <label for="endereco-embarque" class="form-label">Endereço de Embarque</label>
-        <input type="text" class="form-control" id="endereco-embarque" required>
-      </div>
-      <div class="mb-3">
-        <label for="endereco-desembarque" class="form-label">Endereço de Desembarque</label>
-        <input type="text" class="form-control" id="endereco-desembarque" required>
-      </div>
-      <div class="mb-3">
-        <label for="hora-data" class="form-label">Data e Hora da Viagem</label>
-        <input type="datetime-local" class="form-control" id="hora-data" required>
-      </div>
-      <div class="mb-3">
-        <label for="valor-viagem" class="form-label">Valor da Viagem</label>
-        <input type="number" class="form-control" id="valor-viagem" required>
-      </div>
-      <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-    </form>
   </div>
 
   <script>
+    const canalNotificacoes = new BroadcastChannel('notificacoes');
+
+    // Função para carregar os clientes do localStorage
     function carregarClientes() {
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       const tableBody = document.getElementById('clientes-list');
       tableBody.innerHTML = '';
 
       if (clientes.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum cliente cadastrado.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum cliente cadastrado.</td></tr>';
         return;
       }
 
+      // Preenche a tabela com os clientes cadastrados
       clientes.forEach(cliente => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${cliente.nome}</td>
           <td>${cliente.cpf}</td>
           <td>${cliente.email}</td>
+          <td>${cliente.enderecoEmbarque}</td>
+          <td>${cliente.enderecoDesembarque}</td>
           <td>${cliente.horaData}</td>
           <td>R$ ${parseFloat(cliente.valorViagem).toFixed(2)}</td>
           <td>
-            <button class="btn btn-warning" onclick="editarCliente('${cliente.id}')">Editar</button>
-            <button class="btn btn-danger" onclick="excluirCliente('${cliente.id}')">Excluir</button>
-            <button class="btn btn-success" onclick="notificarCliente('${cliente.id}')">Notificar</button>
+            <button class="btn btn-danger btn-sm" onclick="excluirCliente('${cliente.id}')">Excluir</button>
+            <button class="btn btn-success btn-sm" onclick="notificarCliente('${cliente.id}')">Notificar</button>
           </td>
         `;
         tableBody.appendChild(row);
       });
     }
 
-    function editarCliente(id) {
-      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      const cliente = clientes.find(c => c.id === id);
+    // Função para adicionar um cliente
+    function adicionarCliente(event) {
+      event.preventDefault();
 
-      if (cliente) {
-        document.getElementById('cliente-id').value = cliente.id;
-        document.getElementById('nome').value = cliente.nome;
-        document.getElementById('cpf').value = cliente.cpf;
-        document.getElementById('telefone').value = cliente.telefone;
-        document.getElementById('email').value = cliente.email;
-        document.getElementById('endereco-embarque').value = cliente.enderecoEmbarque;
-        document.getElementById('endereco-desembarque').value = cliente.enderecoDesembarque;
-        document.getElementById('hora-data').value = cliente.horaData;
-        document.getElementById('valor-viagem').value = cliente.valorViagem;
-      }
+      const cliente = {
+        id: Date.now().toString(),
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value,
+        email: document.getElementById('email').value,
+        horaData: document.getElementById('hora-data').value,
+        enderecoEmbarque: document.getElementById('endereco-embarque').value,
+        enderecoDesembarque: document.getElementById('endereco-desembarque').value,
+        valorViagem: document.getElementById('valor-viagem').value,
+      };
+
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      clientes.push(cliente);
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      carregarClientes();
+      document.getElementById('form-adicionar-cliente').reset();
     }
 
+    // Função para excluir um cliente
     function excluirCliente(id) {
       let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       clientes = clientes.filter(cliente => cliente.id !== id);
@@ -117,7 +127,8 @@
       carregarClientes();
     }
 
-    async function notificarCliente(id) {
+    // Função para notificar um cliente
+    function notificarCliente(id) {
       const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
       const cliente = clientes.find(c => c.id === id);
 
@@ -126,48 +137,15 @@
         return;
       }
 
-      try {
-        // Simulação de envio de notificação
-        await fetch('http://localhost:3000/notify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(cliente),
-        });
-
-        alert(`Notificação enviada com sucesso para ${cliente.nome}!`);
-      } catch (error) {
-        alert('Erro ao enviar notificação.');
-      }
+      // Envia os dados completos do cliente pelo canal de notificações
+      canalNotificacoes.postMessage(cliente);
+      alert('Notificação enviada com sucesso!');
     }
 
-    document.getElementById('form-editar-cliente').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const cliente = {
-        id: document.getElementById('cliente-id').value || Date.now().toString(),
-        nome: document.getElementById('nome').value,
-        cpf: document.getElementById('cpf').value,
-        telefone: document.getElementById('telefone').value,
-        email: document.getElementById('email').value,
-        enderecoEmbarque: document.getElementById('endereco-embarque').value,
-        enderecoDesembarque: document.getElementById('endereco-desembarque').value,
-        horaData: document.getElementById('hora-data').value,
-        valorViagem: document.getElementById('valor-viagem').value,
-      };
-
-      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      const index = clientes.findIndex(c => c.id === cliente.id);
-      if (index > -1) {
-        clientes[index] = cliente;
-      } else {
-        clientes.push(cliente);
-      }
-
-      localStorage.setItem('clientes', JSON.stringify(clientes));
-      carregarClientes();
-      document.getElementById('form-editar-cliente').reset();
-    });
-
+    // Adiciona o ouvinte para o formulário
+    document.getElementById('form-adicionar-cliente').addEventListener('submit', adicionarCliente);
+    
+    // Carrega os clientes ao carregar a página
     carregarClientes();
   </script>
 </body>

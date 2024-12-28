@@ -269,7 +269,34 @@ app.post('/api/editar-cliente', express.json(), (req, res) => {
     res.status(404).json({ message: 'Cliente não encontrado' });
   }
 });
+//---------------------
 
+
+let notifications = [];
+
+// Endpoint para adicionar notificações
+app.post('/notify', (req, res) => {
+  const notification = req.body;
+  if (notification && notification.message) {
+    notifications.push(notification);
+    res.status(200).send({ message: 'Notificação enviada com sucesso!' });
+  } else {
+    res.status(400).send({ error: 'Corpo inválido. Certifique-se de enviar { "message": "Texto da mensagem" }' });
+  }
+});
+
+// Endpoint para fornecer notificações (long polling)
+app.get('/notify/updates', (req, res) => {
+  if (notifications.length > 0) {
+    const update = notifications.shift();
+    res.status(200).json(update);
+  } else {
+    // Aguardar notificações por até 30 segundos antes de retornar
+    setTimeout(() => {
+      res.status(200).json({ message: 'Nenhuma nova notificação.' });
+    }, 30000);
+  }
+});
 // INICIALIZA O SERVIDOR
 // --------------------------------------------------------------------
 app.listen(PORT, () => {

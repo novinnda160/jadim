@@ -3,31 +3,147 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notificações do Cliente</title>
-</head>
-<body>
-  <h1>Notificações</h1>
-  <ul id="notifications"></ul>
-
-  <script>
-    function longPolling() {
-      fetch('http://localhost:3000/notify/updates')
-        .then(response => response.json())
-        .then(data => {
-          const list = document.getElementById('notifications');
-          const item = document.createElement('li');
-          item.textContent = `Nova notificação: ${data.message}`;
-          list.appendChild(item);
-
-          // Continuar o polling
-          longPolling();
-        })
-        .catch(() => {
-          setTimeout(longPolling, 5000); // Repetir caso ocorra erro
-        });
+  <title>Dados De Sua Viagem</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Cor de fundo com gradiente */
+    body {
+      background: linear-gradient(to right, #2b2b2caa, #464747a8);
+      color: white;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
-    longPolling();
+    /* Container principal */
+    .container {
+      margin-top: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Título principal */
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      font-weight: bold;
+    }
+
+    /* Estilo dos cards */
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Efeito no card ao passar o mouse */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+      color: #fff;
+      padding: 20px;
+    }
+
+    /* Título dentro do card */
+    .card-title {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    /* Texto do card */
+    .card-text {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 767px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+      }
+
+      .card-text {
+        font-size: 1rem;
+      }
+    }
+
+    /* Estilo do botão de fechar */
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #a047ff;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background-color: #5d19ee;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dados Da Sua Viagem</h1>
+    <div id="notifications" class="row g-3"></div>
+  </div>
+
+  <script>
+    // Criação do canal de notificação
+    const canalNotificacoes = new BroadcastChannel('notificacoes');
+
+    // Função que será chamada quando uma notificação for recebida
+    canalNotificacoes.onmessage = (event) => {
+      const cliente = event.data;
+
+      // Verifica se os dados do cliente existem
+      if (cliente) {
+        const notifications = document.getElementById('notifications');
+        const card = document.createElement('div');
+        card.classList.add('col-md-6', 'col-lg-4');
+        card.innerHTML = `
+          <div class="card">
+            <div class="card-body">
+              <button class="close-btn" onclick="fecharNotificacao(this)">×</button>
+              <h5 class="card-title">${cliente.nome}</h5>
+              <p class="card-text"><strong>CPF:</strong> ${cliente.cpf}</p>
+              <p class="card-text"><strong>Email:</strong> ${cliente.email}</p>
+              <p class="card-text"><strong>Endereço Embarque:</strong> ${cliente.enderecoEmbarque}</p>
+              <p class="card-text"><strong>Endereço Desembarque:</strong> ${cliente.enderecoDesembarque}</p>
+              <p class="card-text"><strong>Data e Hora da Viagem:</strong> ${cliente.horaData}</p>
+              <p class="card-text"><strong>Valor da Viagem:</strong> R$ ${parseFloat(cliente.valorViagem).toFixed(2)}</p>
+            </div>
+          </div>
+        `;
+        notifications.appendChild(card);
+      } else {
+        console.error('Dados do cliente não encontrados!');
+      }
+    };
+
+    // Função para fechar a notificação
+    function fecharNotificacao(button) {
+      const card = button.closest('.card');
+      card.remove();
+    }
   </script>
 </body>
 </html>
